@@ -6,8 +6,19 @@ GET {{URL}}
 ### Obter pelo ID
 GET {{URL}}/1
 
+###
 POST {{URL}}
+Content-Type: application/json
 
+{
+    "name": "Julianaaaaaa",
+    "email": "juliana@gmail.com",
+    "password": "1234",
+    "phone": "1223444"
+}
+
+###
 PUT {{URL}}
 
+###
 DELETE {{URL}}

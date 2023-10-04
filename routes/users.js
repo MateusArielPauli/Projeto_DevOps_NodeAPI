@@ -1,41 +1,97 @@
 var express = require('express');
 var router = express.Router();
-
-const lista = [
-  {id: 1, nome: "Juca"},
-  {id: 2, nome: "Ze"},
-  {id: 3, nome: "Juliana"}
-]
+const User = require("../models/User");
 
 /**
  * Obter pelo ID
  */
-router.get("/:id", (req, res) => {
-  const { id } = req.params; // desestruturação
-  //const id = req.params.id; equivalente a linha de cima
+router.get("/:id", async(req, res) => {
+  const { id } = req.params;
 
-  const user = lista.find(e => e.id === id);
+  try{
+    new mongoose.Types.ObjectId(id);
+  }
+  catch(err) {
+    return res.status(400).json({ message: "Formato do ID inválido"});
+  }
 
-  return user ? res.json(user) : res.sendStatus(404);
+  const user = await User.findById(id);
+
+  return user
+    ? res.json(user)
+    : res.status(404).json({ message: "ID inexistente"});
 } );
 
 /**
  * Obter todos os usuarios da API
  */
-router.get('/', (request, response) => {
-  response.json(lista);
+router.get('/', async (request, response) => {
+  const users = await User.find();
+
+  return response.json(users);
 } );
 
-router.post("/", (req, res) => {
-  res.send("Funcionou POST");
+/**
+ * Cadastrar usuario na colecao
+ */
+router.post("/", async (req, res) => {
+  const user = req.body;
+
+  const result = await User.create(user);
+
+  res.send(user);
+  //return result.json(result);
+
 } );
 
-router.put("/", (req, res) => {
-  res.send("Funcionou PUT");
+/**
+ * Atualizar usuario
+ */
+router.put("/:id", async(req, res) => {
+  const userJson = req.body; //dados do usuario para atualizar
+  const { id } = req.params; //o id do usuario
+
+  try{
+    new mongoose.Types.ObjectId(id);
+  }
+  catch(err) {
+    return res.status(400).json({ message: "Formato do ID inválido"});
+  }
+
+  const userConfere = await User.findById(id);
+
+  if(userConfere){
+    userJson.updatedAt = new Date();
+    userJson.createdAt = userConfere.createdAt;
+
+    //Fazer a validação dos atributos do objeto
+    const hasErrors = new User(userJson).validateSync();
+    if(hasErrors) return res.status(400).json(hasErrors);
+
+    await User.updateOne({_id: id}, userJson);
+    return res.json(userJson);
+  }
+
 } );
 
-router.delete("/", (req, res) => {
-  res.send("Funcionou DELETE");
+/**
+ * Deletar por ID
+ */
+router.delete("/", async(req, res) => {
+  const { id } = req.params;
+
+  try{
+    new mongoose.Types.ObjectId(id);
+  }
+  catch(err) {
+    return res.status(400).json({ message: "Formato do ID inválido"});
+  }
+
+  const result = await User.deleteOne(id);
+
+  return result.deletedCount > 0
+    ? res.send()
+    : res.status(404).json({ message: "ID inexistente"});
 } );
 
 
