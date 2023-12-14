@@ -2,12 +2,12 @@ FROM node:14
 
 WORKDIR /usr/src/app
 
-COPY node-api/package*.json ./
+COPY package*.json ./
 
 RUN npm install
 
-COPY node-api/ .
+COPY . /
 
-EXPOSE 3002
+EXPOSE 3000
 
 CMD ["npm", "start"]

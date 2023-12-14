@@ -11,8 +11,8 @@ POST {{URL}}
 Content-Type: application/json
 
 {
-    "name": "Julianaaaaaa",
-    "email": "juliana@gmail.com",
+    "name": "Maria",
+    "email": "Maria@gmail.com",
     "password": "1234",
     "phone": "1223444"
 }
